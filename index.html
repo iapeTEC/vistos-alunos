@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#f4f6f1">
+    <meta name="description" content="Leitor rápido de QR code para registrar vistos escolares.">
+    <title>Vistos — Leitor</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="assets/styles.css">
+    <script>
+      document.documentElement.dataset.theme = localStorage.getItem('vistos-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    </script>
+    <script defer src="config.js"></script>
+    <script defer src="vendor/html5-qrcode.min.js"></script>
+    <script defer src="assets/app.js"></script>
+    <script defer src="assets/scanner.js"></script>
+  </head>
+  <body data-page="scanner">
+    <header class="topbar shell">
+      <a class="brand" href="index.html" aria-label="Vistos — início">
+        <span class="brand-mark" aria-hidden="true">V</span>
+        <span>Vistos</span>
+      </a>
+      <div class="topbar-actions">
+        <a class="icon-button" href="dashboard.html" aria-label="Abrir dashboard" title="Dashboard">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6v-9h-6v9Zm0-16v5h6V4h-6Z"/></svg>
+        </a>
+        <button class="icon-button" id="themeToggle" type="button" aria-label="Alternar tema" title="Alternar tema">
+          <svg class="sun-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0-15v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+          <svg class="moon-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20.1 15.5A8.5 8.5 0 0 1 8.5 3.9 8.5 8.5 0 1 0 20.1 15.5Z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="shell page-stack">
+      <section class="round-card" id="roundCard" aria-live="polite">
+        <div>
+          <p class="eyebrow">Atividade atual</p>
+          <h1 id="roundTitle">Nenhuma atividade aberta</h1>
+          <p class="muted" id="roundMeta">Crie uma atividade antes de ler os QR codes.</p>
+        </div>
+        <div class="round-actions">
+          <button class="button button-primary" id="newRoundButton" type="button">Nova atividade</button>
+          <button class="button button-quiet hidden" id="closeRoundButton" type="button">Encerrar</button>
+        </div>
+      </section>
+
+      <section class="scanner-card">
+        <div class="scanner-stage" id="scannerStage">
+          <div id="reader" aria-label="Visualização da câmera"></div>
+          <div class="scanner-placeholder" id="scannerPlaceholder">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7V4h3M17 4h3v3M20 17v3h-3M7 20H4v-3M7 9h3v3H7V9Zm7 0h3v3h-3V9Zm-7 5h3v3H7v-3Zm7 0h3v3h-3v-3Z"/></svg>
+            <p>A câmera aparecerá aqui</p>
+          </div>
+          <div class="scan-line" aria-hidden="true"></div>
+        </div>
+
+        <div class="scanner-controls">
+          <button class="button button-primary button-large" id="cameraButton" type="button" disabled>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 4 7.2 6H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3.2L15 4H9Zm3 13.2A4.2 4.2 0 1 1 12 8.8a4.2 4.2 0 0 1 0 8.4Z"/></svg>
+            <span>Iniciar câmera</span>
+          </button>
+          <button class="button button-secondary" id="manualButton" type="button" disabled>Busca manual</button>
+        </div>
+        <p class="helper">Aponte para o QR. O mesmo aluno recebe apenas um visto por atividade.</p>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Últimos registros</p>
+            <h2>Vistos recentes</h2>
+          </div>
+          <span class="live-dot"><i></i> Ao vivo</span>
+        </div>
+        <div class="empty-state compact" id="recentEmpty">Nenhum visto registrado ainda.</div>
+        <ol class="recent-list" id="recentList"></ol>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Navegação principal">
+      <a class="active" href="index.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7V4h3M17 4h3v3M20 17v3h-3M7 20H4v-3M7 9h3v3H7V9Zm7 0h3v3h-3V9Zm-7 5h3v3H7v-3Zm7 0h3v3h-3v-3Z"/></svg>
+        <span>Leitor</span>
+      </a>
+      <a href="dashboard.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6v-9h-6v9Zm0-16v5h6V4h-6Z"/></svg>
+        <span>Dashboard</span>
+      </a>
+    </nav>
+
+    <dialog class="modal" id="loginDialog" data-static>
+      <form class="modal-card login-card" id="loginForm">
+        <span class="brand-mark large" aria-hidden="true">V</span>
+        <p class="eyebrow">Acesso do professor</p>
+        <h2>Entre no Vistos</h2>
+        <p class="muted">Use o PIN configurado para proteger os dados das turmas.</p>
+        <label class="field">
+          <span>PIN</span>
+          <input id="pinInput" name="pin" type="password" inputmode="numeric" autocomplete="current-password" minlength="6" required placeholder="••••••">
+        </label>
+        <p class="form-error" id="loginError" role="alert"></p>
+        <button class="button button-primary button-large" type="submit">Entrar</button>
+        <p class="privacy-note">Os nomes dos alunos não ficam armazenados neste aparelho.</p>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="roundDialog">
+      <form class="modal-card" id="roundForm">
+        <div class="modal-heading">
+          <div><p class="eyebrow">Nova rodada</p><h2>Criar atividade</h2></div>
+          <button class="icon-button close-dialog" type="button" aria-label="Fechar">×</button>
+        </div>
+        <label class="field">
+          <span>Turma</span>
+          <select id="roundClass" required></select>
+        </label>
+        <label class="field">
+          <span>Nome da atividade</span>
+          <input id="roundName" type="text" maxlength="80" required placeholder="Ex.: Workbook página 12">
+        </label>
+        <p class="helper">A atividade anterior será encerrada automaticamente.</p>
+        <div class="modal-actions">
+          <button class="button button-quiet close-dialog" type="button">Cancelar</button>
+          <button class="button button-primary" type="submit">Criar e escanear</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="manualDialog">
+      <div class="modal-card modal-tall">
+        <div class="modal-heading">
+          <div><p class="eyebrow">Plano B</p><h2>Busca manual</h2></div>
+          <button class="icon-button close-dialog" type="button" aria-label="Fechar">×</button>
+        </div>
+        <label class="search-field">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m21 21-4.3-4.3M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/></svg>
+          <input id="manualSearch" type="search" placeholder="Buscar aluno pelo nome">
+        </label>
+        <div class="student-picker" id="manualStudents"></div>
+      </div>
+    </dialog>
+
+    <div class="result-sheet" id="resultSheet" aria-live="assertive" aria-hidden="true">
+      <div class="result-icon" id="resultIcon">✓</div>
+      <div class="result-copy"><strong id="resultTitle"></strong><span id="resultMeta"></span></div>
+      <button class="button-link" id="undoButton" type="button">Desfazer</button>
+    </div>
+    <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+  </body>
+</html>

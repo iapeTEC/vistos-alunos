@@ -1,0 +1,14 @@
+{
+  "name": "Vistos — Pontuação escolar",
+  "short_name": "Vistos",
+  "description": "Leitor de QR code e dashboard de vistos escolares.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f1",
+  "theme_color": "#18201d",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

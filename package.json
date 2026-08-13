@@ -1,0 +1,18 @@
+{
+  "name": "vistos-alunos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Leitor de QR code e dashboard de vistos escolares.",
+  "scripts": {
+    "import:students": "node tools/import-rosters.mjs",
+    "generate:pdfs": "node tools/generate-qr-pdfs.mjs",
+    "bootstrap:appscript": "node tools/bootstrap-appscript.mjs",
+    "validate": "node tools/validate.mjs",
+    "test": "npm run validate"
+  },
+  "dependencies": {
+    "html5-qrcode": "^2.3.8",
+    "pdfkit": "^0.17.2",
+    "qrcode": "^1.5.4"
+  }
+}

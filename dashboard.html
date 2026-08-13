@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#f4f6f1">
+    <meta name="description" content="Dashboard de vistos e notas por aluno.">
+    <title>Vistos — Dashboard</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="assets/styles.css">
+    <script>
+      document.documentElement.dataset.theme = localStorage.getItem('vistos-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    </script>
+    <script defer src="config.js"></script>
+    <script defer src="assets/app.js"></script>
+    <script defer src="assets/dashboard.js"></script>
+  </head>
+  <body data-page="dashboard">
+    <header class="topbar shell">
+      <a class="brand" href="index.html" aria-label="Vistos — início">
+        <span class="brand-mark" aria-hidden="true">V</span>
+        <span>Vistos</span>
+      </a>
+      <div class="topbar-actions">
+        <button class="icon-button" id="refreshButton" type="button" aria-label="Atualizar dados" title="Atualizar">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.34 5.66M20 4v7h-7"/></svg>
+        </button>
+        <button class="icon-button" id="themeToggle" type="button" aria-label="Alternar tema" title="Alternar tema">
+          <svg class="sun-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0-15v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+          <svg class="moon-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20.1 15.5A8.5 8.5 0 0 1 8.5 3.9 8.5 8.5 0 1 0 20.1 15.5Z"/></svg>
+        </button>
+        <button class="avatar-button" id="accountButton" type="button" aria-label="Conta e segurança">BH</button>
+      </div>
+    </header>
+
+    <main class="shell dashboard-page page-stack">
+      <section class="page-heading">
+        <div>
+          <p class="eyebrow">Visão geral</p>
+          <h1>Dashboard</h1>
+          <p class="muted" id="updatedAt">Carregando dados…</p>
+        </div>
+        <a class="button button-primary" href="index.html">Abrir leitor</a>
+      </section>
+
+      <section class="active-banner hidden" id="activeBanner">
+        <span class="status-dot"></span>
+        <div><strong id="activeBannerTitle"></strong><span id="activeBannerMeta"></span></div>
+        <a class="button-link" href="index.html">Continuar</a>
+      </section>
+
+      <section class="summary-grid" aria-label="Resumo">
+        <article class="metric-card"><span>Alunos</span><strong id="metricStudents">—</strong><small>na seleção</small></article>
+        <article class="metric-card"><span>Atividades</span><strong id="metricRounds">—</strong><small>válidas</small></article>
+        <article class="metric-card accent"><span>Média</span><strong id="metricAverage">—</strong><small>de 0 a 10</small></article>
+        <article class="metric-card"><span>Hoje</span><strong id="metricToday">—</strong><small>vistos lançados</small></article>
+      </section>
+
+      <section class="section-block dashboard-table-card">
+        <div class="section-heading dashboard-controls">
+          <div><p class="eyebrow">Desempenho</p><h2>Vistos por aluno</h2></div>
+          <button class="button button-secondary" id="exportButton" type="button">Exportar CSV</button>
+        </div>
+        <div class="filter-row">
+          <label class="field inline-field"><span>Turma</span><select id="classFilter"><option value="">Todas</option></select></label>
+          <label class="search-field grow">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m21 21-4.3-4.3M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/></svg>
+            <input id="studentSearch" type="search" placeholder="Buscar aluno">
+          </label>
+        </div>
+        <div class="table-wrap">
+          <table class="student-table">
+            <thead><tr><th>Aluno</th><th>Turma</th><th>Progresso</th><th>Vistos</th><th>Nota</th></tr></thead>
+            <tbody id="studentTableBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state hidden" id="dashboardEmpty">Nenhum aluno encontrado.</div>
+        <p class="formula-note"><strong>Como a nota é calculada:</strong> vistos recebidos ÷ atividades da turma × 10.</p>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Navegação principal">
+      <a href="index.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7V4h3M17 4h3v3M20 17v3h-3M7 20H4v-3M7 9h3v3H7V9Zm7 0h3v3h-3V9Zm-7 5h3v3H7v-3Zm7 0h3v3h-3v-3Z"/></svg>
+        <span>Leitor</span>
+      </a>
+      <a class="active" href="dashboard.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6v-9h-6v9Zm0-16v5h6V4h-6Z"/></svg>
+        <span>Dashboard</span>
+      </a>
+    </nav>
+
+    <dialog class="modal" id="loginDialog" data-static>
+      <form class="modal-card login-card" id="loginForm">
+        <span class="brand-mark large" aria-hidden="true">V</span>
+        <p class="eyebrow">Acesso do professor</p>
+        <h2>Entre no Vistos</h2>
+        <p class="muted">Use o PIN configurado para proteger os dados das turmas.</p>
+        <label class="field"><span>PIN</span><input id="pinInput" name="pin" type="password" inputmode="numeric" autocomplete="current-password" minlength="6" required placeholder="••••••"></label>
+        <p class="form-error" id="loginError" role="alert"></p>
+        <button class="button button-primary button-large" type="submit">Entrar</button>
+        <p class="privacy-note">Os nomes dos alunos não ficam armazenados neste aparelho.</p>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="studentDialog">
+      <div class="modal-card modal-tall">
+        <div class="modal-heading">
+          <div><p class="eyebrow" id="studentDetailClass"></p><h2 id="studentDetailName"></h2></div>
+          <button class="icon-button close-dialog" type="button" aria-label="Fechar">×</button>
+        </div>
+        <div class="history-list" id="studentHistory"></div>
+      </div>
+    </dialog>
+
+    <dialog class="modal" id="accountDialog">
+      <div class="modal-card">
+        <div class="modal-heading">
+          <div><p class="eyebrow">Segurança</p><h2>Conta</h2></div>
+          <button class="icon-button close-dialog" type="button" aria-label="Fechar">×</button>
+        </div>
+        <button class="button button-secondary full-width" id="changePinButton" type="button">Alterar PIN</button>
+        <button class="button button-danger full-width" id="logoutButton" type="button">Sair deste aparelho</button>
+      </div>
+    </dialog>
+
+    <dialog class="modal" id="pinDialog">
+      <form class="modal-card" id="pinForm">
+        <div class="modal-heading">
+          <div><p class="eyebrow">Segurança</p><h2>Novo PIN</h2></div>
+          <button class="icon-button close-dialog" type="button" aria-label="Fechar">×</button>
+        </div>
+        <label class="field"><span>Novo PIN (mínimo 6 dígitos)</span><input id="newPin" type="password" inputmode="numeric" pattern="[0-9]{6,12}" minlength="6" maxlength="12" required></label>
+        <label class="field"><span>Repita o novo PIN</span><input id="confirmPin" type="password" inputmode="numeric" pattern="[0-9]{6,12}" minlength="6" maxlength="12" required></label>
+        <p class="form-error" id="pinError" role="alert"></p>
+        <div class="modal-actions"><button class="button button-quiet close-dialog" type="button">Cancelar</button><button class="button button-primary" type="submit">Salvar PIN</button></div>
+      </form>
+    </dialog>
+
+    <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+  </body>
+</html>
