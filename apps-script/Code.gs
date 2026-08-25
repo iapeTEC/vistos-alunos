@@ -12,6 +12,8 @@ const APP = Object.freeze({
   properties: Object.freeze({
     authHash: 'VISTOS_AUTH_HASH',
     authVersion: 'VISTOS_AUTH_VERSION',
+    ownerEmail: 'VISTOS_OWNER_EMAIL',
+    pinReset: 'VISTOS_PIN_RESET',
     bootstrappedAt: 'VISTOS_BOOTSTRAPPED_AT',
     students: 'DATA_STUDENTS',
     rounds: 'DATA_ROUNDS',
@@ -408,6 +410,41 @@ function changePin_(newPinHash, currentToken) {
   });
   CacheService.getScriptCache().remove('session:' + String(currentToken || ''));
   return { changed: true };
+}
+
+/**
+ * Reset manual do PIN, executavel somente pelo proprietario autorizado no
+ * editor do Apps Script. Defina VISTOS_OWNER_EMAIL e VISTOS_PIN_RESET nas
+ * Script Properties, execute uma vez e remova VISTOS_PIN_RESET em seguida.
+ */
+function resetPinForOwner() {
+  const props = PropertiesService.getScriptProperties();
+  const ownerEmail = String(props.getProperty(APP.properties.ownerEmail) || '').toLowerCase().trim();
+  const newPin = String(props.getProperty(APP.properties.pinReset) || '').trim();
+  const email = String(Session.getEffectiveUser().getEmail() || '').toLowerCase().trim();
+
+  if (!ownerEmail || email !== ownerEmail) throw new Error('Conta não autorizada para resetar o PIN.');
+  if (!/^\d{6,12}$/.test(newPin)) {
+    throw new Error('Defina VISTOS_PIN_RESET com 6 a 12 números nas Script Properties.');
+  }
+
+  const bytes = Utilities.computeDigest(
+    Utilities.DigestAlgorithm.SHA_256,
+    newPin,
+    Utilities.Charset.UTF_8
+  );
+  const hash = bytes.map((byte) => {
+    const value = byte < 0 ? byte + 256 : byte;
+    return value.toString(16).padStart(2, '0');
+  }).join('');
+
+  props.setProperties({
+    [APP.properties.authHash]: hash,
+    [APP.properties.authVersion]: Utilities.getUuid()
+  });
+  props.deleteProperty(APP.properties.pinReset);
+  CacheService.getScriptCache().removeAll([]);
+  return 'PIN redefinido com sucesso e valor temporario removido.';
 }
 
 function bootstrapForCli(payload) {
